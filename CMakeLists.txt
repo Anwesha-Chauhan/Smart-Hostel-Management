@@ -15,6 +15,7 @@ add_executable(hostel_db_test
     modules/rooms/RoomService.cpp
     modules/allocations/AllocationService.cpp
     modules/fees/FeeService.cpp
+    modules/complaints/ComplaintService.cpp
 )
 
 target_include_directories(hostel_db_test PRIVATE
@@ -23,6 +24,7 @@ target_include_directories(hostel_db_test PRIVATE
     "${CMAKE_CURRENT_SOURCE_DIR}/modules/rooms"
     "${CMAKE_CURRENT_SOURCE_DIR}/modules/allocations"
     "${CMAKE_CURRENT_SOURCE_DIR}/modules/fees"
+    "${CMAKE_CURRENT_SOURCE_DIR}/modules/complaints"
 )
 
 target_link_libraries(hostel_db_test
