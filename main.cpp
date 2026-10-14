@@ -7,6 +7,7 @@
 #include "RoomService.h"
 #include "AllocationService.h"
 #include "FeeService.h"
+#include "ComplaintService.h"
 
 using namespace std;
 
@@ -57,10 +58,14 @@ int main()
                 case 4:
                     feeManagementMenu(con.get());
                     break;
+
                 case 5:
+                    complaintManagementMenu(con.get());
+                    break;    
+                case 6:
                     cout << "This module will be implemented next.\n";
                     break;
-                case 6:
+                case 7:
                     cout << "Thank you for using Smart Hostel Management System!\n";
                     break;
 
