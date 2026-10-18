@@ -16,6 +16,10 @@ add_executable(hostel_db_test
     modules/allocations/AllocationService.cpp
     modules/fees/FeeService.cpp
     modules/complaints/ComplaintService.cpp
+    modules/leave/LeaveService.cpp
+    modules/attendence/AttendenceService.cpp
+    modules/visitors/VisitorService.cpp
+    modules/notices/NoticeService.cpp
 )
 
 target_include_directories(hostel_db_test PRIVATE
@@ -25,6 +29,10 @@ target_include_directories(hostel_db_test PRIVATE
     "${CMAKE_CURRENT_SOURCE_DIR}/modules/allocations"
     "${CMAKE_CURRENT_SOURCE_DIR}/modules/fees"
     "${CMAKE_CURRENT_SOURCE_DIR}/modules/complaints"
+    "${CMAKE_CURRENT_SOURCE_DIR}/modules/leave"
+    "${CMAKE_CURRENT_SOURCE_DIR}/modules/attendence"
+    "${CMAKE_CURRENT_SOURCE_DIR}/modules/visitors"
+    "${CMAKE_CURRENT_SOURCE_DIR}/modules/notices"
 )
 
 target_link_libraries(hostel_db_test
