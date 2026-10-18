@@ -8,6 +8,10 @@
 #include "AllocationService.h"
 #include "FeeService.h"
 #include "ComplaintService.h"
+#include "LeaveService.h"
+#include "VisitorService.h"
+#include "AttendenceService.h"
+#include "NoticeService.h"
 
 using namespace std;
 
@@ -19,7 +23,7 @@ int main()
 
         cout << "Database connected successfully!\n";
 
-        int choice;
+        int choice = 0;
 
         do
         {
@@ -31,7 +35,11 @@ int main()
             cout << "3. Room Allocation\n";
             cout << "4. Fee Management\n";
             cout << "5. Complaint Management\n";
-            cout << "6. Exit\n";
+            cout << "6. Leave Management\n";
+            cout << "7. Visitor Management\n";
+            cout << "8. Attendance Management\n";
+            cout << "9. Notice Management\n";
+            cout << "10. Exit\n";
             cout << "Enter your choice: ";
 
             if (!(cin >> choice))
@@ -55,29 +63,44 @@ int main()
                 case 3:
                     allocationManagementMenu(con.get());
                     break;
+
                 case 4:
                     feeManagementMenu(con.get());
                     break;
 
                 case 5:
                     complaintManagementMenu(con.get());
-                    break;    
-                case 6:
-                    cout << "This module will be implemented next.\n";
                     break;
+
+                case 6:
+                    leaveManagementMenu(con.get());
+                    break;
+
                 case 7:
+                    visitorManagementMenu(con.get());
+                    break;
+
+                case 8:
+                    attendenceManagementMenu(con.get());
+                    break;
+
+                case 9:
+                    noticeManagementMenu(con.get());
+                    break;
+
+                case 10:
                     cout << "Thank you for using Smart Hostel Management System!\n";
                     break;
 
                 default:
-                    cout << "Invalid choice.\n";
+                    cout << "Invalid choice. Please try again.\n";
             }
 
-        } while (choice != 6);
+        } while (choice != 10);
     }
     catch (sql::SQLException& e)
     {
-        cerr << "Database connection error: " << e.what() << "\n";
+        cerr << "Database error: " << e.what() << "\n";
         return 1;
     }
     catch (exception& e)
