@@ -1,0 +1,235 @@
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Warden Dashboard - Smart Hostel</title>
+
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: Arial, sans-serif;
+        }
+
+        body {
+            background: #f4f7f5;
+            color: #26352d;
+        }
+
+        .sidebar {
+            width: 245px;
+            height: 100vh;
+            background: #174d35;
+            color: white;
+            position: fixed;
+            padding: 25px 18px;
+        }
+
+        .sidebar h2 {
+            margin-bottom: 35px;
+            font-size: 22px;
+        }
+
+        .sidebar a {
+            display: block;
+            color: white;
+            text-decoration: none;
+            padding: 13px;
+            margin: 7px 0;
+            border-radius: 6px;
+        }
+
+        .sidebar a:hover,
+        .sidebar a.active {
+            background: #28734f;
+        }
+
+        .main {
+            margin-left: 245px;
+            padding: 30px;
+        }
+
+        .topbar {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 30px;
+        }
+
+        .role {
+            background: #dcefe3;
+            color: #174d35;
+            padding: 9px 16px;
+            border-radius: 20px;
+            font-weight: bold;
+        }
+
+        .welcome {
+            margin-bottom: 25px;
+        }
+
+        .welcome p {
+            color: #68776e;
+            margin-top: 8px;
+        }
+
+        .section-title {
+            margin: 25px 0 15px;
+        }
+
+        .cards {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+            gap: 20px;
+        }
+
+        .card {
+            background: white;
+            padding: 23px;
+            border-radius: 10px;
+            box-shadow: 0 2px 9px rgba(0,0,0,0.06);
+            border-left: 5px solid #28734f;
+        }
+
+        .card h3 {
+            margin-bottom: 12px;
+            font-size: 17px;
+        }
+
+        .card p {
+            color: #68776e;
+            font-size: 14px;
+            line-height: 1.5;
+        }
+
+        .status {
+            display: inline-block;
+            margin-top: 15px;
+            color: #28734f;
+            font-size: 13px;
+            font-weight: bold;
+        }
+
+        .notice {
+            background: white;
+            padding: 22px;
+            border-radius: 10px;
+            margin-top: 25px;
+        }
+
+        @media (max-width: 700px) {
+            .sidebar {
+                width: 100%;
+                height: auto;
+                position: relative;
+            }
+
+            .main {
+                margin-left: 0;
+                padding: 20px;
+            }
+        }
+    </style>
+</head>
+
+<body>
+
+    <aside class="sidebar">
+        <h2>Smart Hostel</h2>
+
+        <a href="#" class="active">Dashboard</a>
+        <a href="#leave">Leave Requests</a>
+        <a href="#visitors">Visitor Management</a>
+        <a href="#attendance">Attendance</a>
+        <a href="#complaints">Complaints</a>
+        <a href="#rooms">Room Records</a>
+        <a href="#fees">Fee Records</a>
+        <a href="#notices">Notices</a>
+        <a href="/api/logout">Logout</a>
+    </aside>
+
+    <main class="main">
+
+        <header class="topbar">
+            <h2>Warden Dashboard</h2>
+            <span class="role">WARDEN</span>
+        </header>
+
+        <section class="welcome">
+            <h1>Welcome, Warden!</h1>
+            <p>Manage hostel operations and monitor student activities.</p>
+        </section>
+
+        <h2 class="section-title">Hostel Operations</h2>
+
+        <section class="cards">
+
+            
+<div class="card" id="leave">
+    <h3>Leave Requests</h3>
+    <p>View student leave applications and approve or reject requests.</p>
+    <span class="status">Warden Access</span>
+    <a href="/pages/leave-management.html" class="action">
+        Manage Leave Requests
+    </a>
+</div>
+
+            <div class="card" id="visitors">
+    <h3>Visitor Management</h3>
+    <p>Monitor visitor entries and manage visitor records.</p>
+    <span class="status">Warden Access</span>
+
+    <a href="/pages/visitor-management.html" class="action">
+        Manage Visitors
+    </a>
+</div>
+
+            <div class="card" id="attendance">
+                <h3>Attendance</h3>
+                <p>Record and monitor student hostel attendance.</p>
+                <span class="status">Warden Access</span>
+            </div>
+
+            <div class="card" id="complaints">
+    <h3>Complaints</h3>
+    <p>Review student complaints and assign maintenance work.</p>
+    <span class="status">Warden Access</span>
+
+    <a href="/pages/complaint-management.html" class="action">
+        Manage Complaints
+    </a>
+</div>
+
+        </section>
+
+        <h2 class="section-title">View Only</h2>
+
+        <section class="cards">
+
+            <div class="card" id="rooms">
+                <h3>Room Records</h3>
+                <p>View room availability and existing room allocation records.</p>
+                <span class="status">View Only</span>
+            </div>
+
+            <div class="card" id="fees">
+                <h3>Fee Records</h3>
+                <p>View student fee and payment information.</p>
+                <span class="status">View Only</span>
+            </div>
+
+        </section>
+
+        <section class="notice" id="notices">
+            <h3>Notice Management</h3>
+            <p>Publish important hostel announcements for students.</p>
+            <span class="status">Warden Access</span>
+        </section>
+
+    </main>
+
+</body>
+</html>
