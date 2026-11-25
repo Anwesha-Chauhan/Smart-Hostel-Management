@@ -1,0 +1,159 @@
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>User Management | SHMS</title>
+    <link rel="stylesheet" href="../css/style.css">
+</head>
+
+<body>
+
+<div class="container">
+
+    <aside class="sidebar">
+        <div class="logo">
+            <h2>SHMS</h2>
+            <p>Hostel Management</p>
+        </div>
+
+        <nav>
+            <a href="../index.html">Dashboard</a>
+            <a href="students.html" class="active">Students & Staff</a>
+            <a href="rooms.html">Room Management</a>
+            <a href="allocation.html">Room Allocation</a>
+            <a href="#">Fee Management</a>
+            <a href="#">Complaints</a>
+            <a href="#">Leave Requests</a>
+            <a href="#">Visitors</a>
+            <a href="#">Attendance</a>
+            <a href="#">Notices</a>
+        </nav>
+
+        <div class="sidebar-bottom">
+            <a href="/api/logout">Logout</a>
+        </div>
+    </aside>
+
+    <main class="main-content">
+
+        <header class="topbar">
+            <div>
+                <h2>User Management</h2>
+                <p>Manage hostel students and staff information</p>
+            </div>
+
+            <div class="profile">
+                <span>Admin</span>
+                <div class="avatar">A</div>
+            </div>
+        </header>
+
+        <section class="section">
+
+            <div class="student-toolbar">
+                <input
+                    type="text"
+                    id="searchStudent"
+                    placeholder="Search by name or user ID..."
+                >
+
+                <button onclick="openStudentForm()">
+                    + Add User
+                </button>
+            </div>
+
+            <div class="table-container">
+                <table>
+                    <thead>
+                        <tr>
+                            <th>User ID</th>
+                            <th>Name</th>
+                            <th>Email</th>
+                            <th>Phone</th>
+                            <th>Role</th>
+                            <th>Actions</th>
+                        </tr>
+                    </thead>
+
+                    <tbody id="studentTable">
+                        <tr>
+                            <td colspan="6">Loading users...</td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+
+        </section>
+
+        <div class="modal" id="studentModal">
+            <div class="modal-content">
+
+                <h2>Add New User</h2>
+
+                <form id="studentForm">
+
+                    <input
+                        type="text"
+                        id="studentName"
+                        placeholder="Full Name"
+                        required
+                    >
+
+                    <input
+                        type="email"
+                        id="studentEmail"
+                        placeholder="Email Address"
+                        required
+                    >
+
+                    <input
+                        type="tel"
+                        id="studentPhone"
+                        placeholder="Phone Number"
+                        required
+                    >
+
+                    <select id="userRole" required>
+                        <option value="">Select User Role</option>
+                        <option value="Student">Student</option>
+                        <option value="Warden">Warden</option>
+                        <option value="Maintenance">Maintenance</option>
+                        <option value="Admin">Admin</option>
+                    </select>
+
+                    <input
+                        type="password"
+                        id="userPassword"
+                        placeholder="Password (minimum 8 characters)"
+                        minlength="8"
+                        autocomplete="new-password"
+                        required
+                    >
+
+                    <div class="form-buttons">
+                        <button type="submit">Save User</button>
+
+                        <button
+                            type="button"
+                            class="cancel-btn"
+                            onclick="closeStudentForm()"
+                        >
+                            Cancel
+                        </button>
+                    </div>
+
+                </form>
+
+            </div>
+        </div>
+
+    </main>
+
+</div>
+
+<script src="../js/script.js"></script>
+
+</body>
+</html>
