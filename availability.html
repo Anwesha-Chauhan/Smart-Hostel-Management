@@ -1,0 +1,230 @@
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Room Availability - Smart Hostel</title>
+    <link rel="stylesheet" href="../css/style.css">
+
+    <style>
+        .availability-summary {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(170px, 1fr));
+            gap: 20px;
+            margin: 25px 0;
+        }
+
+        .availability-card {
+            background: white;
+            padding: 22px;
+            border-radius: 10px;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.08);
+        }
+
+        .availability-card h3 {
+            font-size: 15px;
+            color: #666;
+        }
+
+        .availability-card p {
+            font-size: 28px;
+            font-weight: bold;
+            margin-top: 10px;
+        }
+
+        .availability-table {
+            background: white;
+            padding: 20px;
+            border-radius: 10px;
+            overflow-x: auto;
+        }
+
+        .availability-table table {
+            width: 100%;
+            border-collapse: collapse;
+        }
+
+        .availability-table th,
+        .availability-table td {
+            padding: 12px;
+            text-align: left;
+            border-bottom: 1px solid #ddd;
+        }
+
+        .room-status {
+            font-weight: bold;
+        }
+
+        .status-available {
+            color: green;
+        }
+
+        .status-full {
+            color: red;
+        }
+
+        .status-maintenance {
+            color: #d97706;
+        }
+    </style>
+</head>
+
+<body>
+
+<div class="dashboard">
+
+    <aside class="sidebar">
+        <h2>Smart Hostel</h2>
+
+        <nav>
+            <a href="../index.html">Dashboard</a>
+            <a href="students.html">Students & Staff</a>
+            <a href="rooms.html">Room Management</a>
+            <a href="availability.html" class="active">Room Availability</a>
+            <a href="allocation.html">Room Allocation</a>
+            <a href="/api/logout" class="logout">Logout</a>
+        </nav>
+    </aside>
+
+    <main class="main-content">
+
+        <header class="topbar">
+            <h1>Room Availability</h1>
+            <p>Monitor hostel room occupancy and availability</p>
+        </header>
+
+        <section class="availability-summary">
+
+            <div class="availability-card">
+                <h3>Total Rooms</h3>
+                <p id="totalRooms">0</p>
+            </div>
+
+            <div class="availability-card">
+                <h3>Available Rooms</h3>
+                <p id="availableRooms">0</p>
+            </div>
+
+            <div class="availability-card">
+                <h3>Full Rooms</h3>
+                <p id="fullRooms">0</p>
+            </div>
+
+            <div class="availability-card">
+                <h3>Maintenance</h3>
+                <p id="maintenanceRooms">0</p>
+            </div>
+
+        </section>
+
+        <section class="availability-table">
+
+            <h2>Room Availability Details</h2>
+
+            <p id="availabilityMessage">Loading room details...</p>
+
+            <table>
+                <thead>
+                    <tr>
+                        <th>Room ID</th>
+                        <th>Room Number</th>
+                        <th>Hostel Block</th>
+                        <th>Capacity</th>
+                        <th>Current Occupancy</th>
+                        <th>Available Beds</th>
+                        <th>Status</th>
+                    </tr>
+                </thead>
+
+                <tbody id="availabilityTableBody">
+                </tbody>
+            </table>
+
+        </section>
+
+    </main>
+</div>
+
+<script>
+async function loadRoomAvailability() {
+    const tbody = document.getElementById("availabilityTableBody");
+    const message = document.getElementById("availabilityMessage");
+
+    try {
+        const response = await fetch("/api/rooms");
+        const result = await response.json();
+
+        if (!response.ok || !result.success) {
+            throw new Error(result.message || "Unable to load rooms.");
+        }
+
+        const rooms = result.rooms || [];
+
+        const available = rooms.filter(room => room.status === "Available");
+        const full = rooms.filter(room => room.status === "Full");
+        const maintenance = rooms.filter(room => room.status === "Maintenance");
+
+        document.getElementById("totalRooms").textContent = rooms.length;
+        document.getElementById("availableRooms").textContent = available.length;
+        document.getElementById("fullRooms").textContent = full.length;
+        document.getElementById("maintenanceRooms").textContent = maintenance.length;
+
+        tbody.innerHTML = "";
+
+        if (rooms.length === 0) {
+            message.textContent = "No rooms found.";
+            return;
+        }
+
+        message.textContent = "Room details loaded successfully.";
+
+        rooms.forEach(room => {
+            const capacity = Number(room.capacity);
+            const occupancy = Number(room.currentOccupancy);
+            const vacantBeds = Math.max(0, capacity - occupancy);
+
+            const row = document.createElement("tr");
+
+            const statusClass = {
+                "Available": "status-available",
+                "Full": "status-full",
+                "Maintenance": "status-maintenance"
+            }[room.status] || "";
+
+            row.innerHTML = `
+                <td>${room.roomId}</td>
+                <td>${escapeHTML(room.roomNumber)}</td>
+                <td>${escapeHTML(room.hostelBlock)}</td>
+                <td>${capacity}</td>
+                <td>${occupancy}</td>
+                <td>${vacantBeds}</td>
+                <td class="room-status ${statusClass}">
+                    ${escapeHTML(room.status)}
+                </td>
+            `;
+
+            tbody.appendChild(row);
+        });
+
+    } catch (error) {
+        message.textContent = error.message;
+        console.error("Room availability error:", error);
+    }
+}
+
+function escapeHTML(value) {
+    return String(value ?? "").replace(/[&<>"']/g, character => ({
+        "&": "&amp;",
+        "<": "&lt;",
+        ">": "&gt;",
+        '"': "&quot;",
+        "'": "&#39;"
+    })[character]);
+}
+
+loadRoomAvailability();
+</script>
+
+</body>
+</html>
