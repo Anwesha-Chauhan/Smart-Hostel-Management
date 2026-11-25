@@ -1,0 +1,348 @@
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Leave Management - Smart Hostel</title>
+    <link rel="stylesheet" href="../css/style.css">
+
+    <style>
+        .summary {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(170px, 1fr));
+            gap: 18px;
+            margin: 22px 0;
+        }
+
+        .summary-card {
+            background: white;
+            padding: 20px;
+            border-radius: 10px;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.08);
+        }
+
+        .summary-card h3 {
+            margin-bottom: 10px;
+        }
+
+        .table-container {
+            background: white;
+            padding: 18px;
+            border-radius: 10px;
+            overflow-x: auto;
+        }
+
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            min-width: 850px;
+        }
+
+        th, td {
+            padding: 12px;
+            text-align: left;
+            border-bottom: 1px solid #ddd;
+        }
+
+        th {
+            background: #f3f4f6;
+        }
+
+        .status {
+            font-weight: bold;
+        }
+
+        .Pending { color: #d97706; }
+        .Approved { color: green; }
+        .Rejected { color: red; }
+
+        .approve-btn, .reject-btn {
+            border: none;
+            padding: 8px 12px;
+            border-radius: 5px;
+            cursor: pointer;
+            color: white;
+            margin: 3px;
+        }
+
+        .approve-btn {
+            background: #16a34a;
+        }
+
+        .reject-btn {
+            background: #dc2626;
+        }
+
+        .approve-btn:disabled, .reject-btn:disabled {
+            opacity: 0.5;
+            cursor: not-allowed;
+        }
+
+        .message {
+            margin: 12px 0;
+            font-weight: bold;
+        }
+
+        .toolbar {
+            display: flex;
+            gap: 12px;
+            align-items: center;
+            flex-wrap: wrap;
+            margin-bottom: 15px;
+        }
+
+        .toolbar select, .toolbar button {
+            padding: 9px 12px;
+        }
+    </style>
+</head>
+
+<body>
+
+<div class="container">
+
+    <h2>Leave Request Management</h2>
+    <p>Review student leave applications and manage their status.</p>
+
+    <div class="summary">
+
+        <div class="summary-card">
+            <h3>Total Requests</h3>
+            <p id="totalRequests">0</p>
+        </div>
+
+        <div class="summary-card">
+            <h3>Pending</h3>
+            <p id="pendingRequests">0</p>
+        </div>
+
+        <div class="summary-card">
+            <h3>Approved</h3>
+            <p id="approvedRequests">0</p>
+        </div>
+
+        <div class="summary-card">
+            <h3>Rejected</h3>
+            <p id="rejectedRequests">0</p>
+        </div>
+
+    </div>
+
+    <div class="table-container">
+
+        <h3>Student Leave Applications</h3>
+
+        <div class="toolbar">
+            <label for="statusFilter">Filter by status:</label>
+
+            <select id="statusFilter">
+                <option value="All">All Requests</option>
+                <option value="Pending">Pending</option>
+                <option value="Approved">Approved</option>
+                <option value="Rejected">Rejected</option>
+            </select>
+
+            <button type="button" id="refreshBtn">Refresh</button>
+        </div>
+
+        <p id="message" class="message"></p>
+
+        <table>
+            <thead>
+                <tr>
+                    <th>Leave ID</th>
+                    <th>Student ID</th>
+                    <th>Student Name</th>
+                    <th>From Date</th>
+                    <th>To Date</th>
+                    <th>Reason</th>
+                    <th>Status</th>
+                    <th>Action</th>
+                </tr>
+            </thead>
+
+            <tbody id="leaveTableBody">
+                <tr>
+                    <td colspan="8">Loading requests...</td>
+                </tr>
+            </tbody>
+        </table>
+
+    </div>
+
+    <br>
+
+    <a href="/dashboards/warden.html" class="action">
+        Back to Warden Dashboard
+    </a>
+
+</div>
+
+<script>
+    let allRequests = [];
+
+    function escapeHTML(value) {
+        return String(value ?? "").replace(/[&<>"']/g, char => ({
+            "&": "&amp;",
+            "<": "&lt;",
+            ">": "&gt;",
+            '"': "&quot;",
+            "'": "&#39;"
+        })[char]);
+    }
+
+    function updateSummary(requests) {
+        document.getElementById("totalRequests").textContent =
+            requests.length;
+
+        document.getElementById("pendingRequests").textContent =
+            requests.filter(r => r.status === "Pending").length;
+
+        document.getElementById("approvedRequests").textContent =
+            requests.filter(r => r.status === "Approved").length;
+
+        document.getElementById("rejectedRequests").textContent =
+            requests.filter(r => r.status === "Rejected").length;
+    }
+
+    function displayRequests() {
+        const tbody = document.getElementById("leaveTableBody");
+        const filter = document.getElementById("statusFilter").value;
+
+        const requests = filter === "All"
+            ? allRequests
+            : allRequests.filter(r => r.status === filter);
+
+        if (requests.length === 0) {
+            tbody.innerHTML = `
+                <tr>
+                    <td colspan="8">No leave requests found.</td>
+                </tr>
+            `;
+            return;
+        }
+
+        tbody.innerHTML = requests.map(request => `
+            <tr>
+                <td>${escapeHTML(request.leaveId)}</td>
+                <td>${escapeHTML(request.userId)}</td>
+                <td>${escapeHTML(request.studentName)}</td>
+                <td>${escapeHTML(request.fromDate)}</td>
+                <td>${escapeHTML(request.toDate)}</td>
+                <td>${escapeHTML(request.reason)}</td>
+                <td class="status ${escapeHTML(request.status)}">
+                    ${escapeHTML(request.status)}
+                </td>
+                <td>
+                    ${request.status === "Pending" ? `
+                        <button class="approve-btn"
+                            data-id="${Number(request.leaveId)}"
+                            data-status="Approved">
+                            Approve
+                        </button>
+
+                        <button class="reject-btn"
+                            data-id="${Number(request.leaveId)}"
+                            data-status="Rejected">
+                            Reject
+                        </button>
+                    ` : "-"}
+                </td>
+            </tr>
+        `).join("");
+    }
+
+    async function loadRequests() {
+        const tbody = document.getElementById("leaveTableBody");
+
+        tbody.innerHTML = `
+            <tr><td colspan="8">Loading requests...</td></tr>
+        `;
+
+        try {
+            const response = await fetch("/api/leave/requests", {
+                credentials: "same-origin",
+                cache: "no-store"
+            });
+
+            const data = await response.json();
+
+            if (!response.ok || !data.success) {
+                throw new Error(data.message || "Could not load requests.");
+            }
+
+            allRequests = data.requests || [];
+
+            updateSummary(allRequests);
+            displayRequests();
+
+        } catch (error) {
+            tbody.innerHTML = `
+                <tr>
+                    <td colspan="8">${escapeHTML(error.message)}</td>
+                </tr>
+            `;
+        }
+    }
+
+    async function updateStatus(leaveId, status) {
+        const message = document.getElementById("message");
+
+        if (!confirm(`Are you sure you want to ${status.toLowerCase()} this leave request?`)) {
+            return;
+        }
+
+        message.textContent = "Updating request...";
+
+        try {
+            const response = await fetch("/api/leave/update", {
+                method: "POST",
+                credentials: "same-origin",
+                headers: {
+                    "Content-Type": "application/x-www-form-urlencoded"
+                },
+                body: new URLSearchParams({
+                    leaveId: leaveId,
+                    status: status
+                })
+            });
+
+            const data = await response.json();
+
+            if (!response.ok || !data.success) {
+                throw new Error(data.message || "Could not update request.");
+            }
+
+            message.textContent = data.message;
+            await loadRequests();
+
+        } catch (error) {
+            message.textContent = error.message;
+        }
+    }
+
+    document.getElementById("leaveTableBody")
+        .addEventListener("click", event => {
+
+            const button = event.target.closest("button[data-id]");
+
+            if (!button) return;
+
+            updateStatus(
+                Number(button.dataset.id),
+                button.dataset.status
+            );
+        });
+
+    document.getElementById("statusFilter")
+        .addEventListener("change", displayRequests);
+
+    document.getElementById("refreshBtn")
+        .addEventListener("click", loadRequests);
+
+    loadRequests();
+</script>
+
+</body>
+</html>
