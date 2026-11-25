@@ -1,0 +1,195 @@
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Maintenance Dashboard - Smart Hostel</title>
+
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: Arial, sans-serif;
+        }
+
+        body {
+            background: #f4f7f5;
+            color: #26352d;
+        }
+
+        .sidebar {
+            width: 245px;
+            height: 100vh;
+            background: #174d35;
+            color: white;
+            position: fixed;
+            padding: 25px 18px;
+        }
+
+        .sidebar h2 {
+            margin-bottom: 35px;
+            font-size: 22px;
+        }
+
+        .sidebar a {
+            display: block;
+            color: white;
+            text-decoration: none;
+            padding: 13px;
+            margin: 7px 0;
+            border-radius: 6px;
+        }
+
+        .sidebar a:hover,
+        .sidebar a.active {
+            background: #28734f;
+        }
+
+        .main {
+            margin-left: 245px;
+            padding: 30px;
+        }
+
+        .topbar {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 30px;
+        }
+
+        .role {
+            background: #dcefe3;
+            color: #174d35;
+            padding: 9px 16px;
+            border-radius: 20px;
+            font-weight: bold;
+        }
+
+        .welcome {
+            margin-bottom: 25px;
+        }
+
+        .welcome p {
+            color: #68776e;
+            margin-top: 8px;
+        }
+
+        .section-title {
+            margin: 25px 0 15px;
+        }
+
+        .cards {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+            gap: 20px;
+        }
+
+        .card {
+            background: white;
+            padding: 23px;
+            border-radius: 10px;
+            box-shadow: 0 2px 9px rgba(0,0,0,0.06);
+            border-left: 5px solid #28734f;
+        }
+
+        .card h3 {
+            margin-bottom: 12px;
+            font-size: 17px;
+        }
+
+        .card p {
+            color: #68776e;
+            font-size: 14px;
+            line-height: 1.5;
+        }
+
+        .status {
+            display: inline-block;
+            margin-top: 15px;
+            color: #28734f;
+            font-size: 13px;
+            font-weight: bold;
+        }
+
+        .notice {
+            background: white;
+            padding: 22px;
+            border-radius: 10px;
+            margin-top: 25px;
+        }
+
+        @media (max-width: 700px) {
+            .sidebar {
+                width: 100%;
+                height: auto;
+                position: relative;
+            }
+
+            .main {
+                margin-left: 0;
+                padding: 20px;
+            }
+        }
+    </style>
+</head>
+
+<body>
+
+    <aside class="sidebar">
+        <h2>Smart Hostel</h2>
+
+        <a href="#" class="active">Dashboard</a>
+        <a href="#complaints">Assigned Complaints</a>
+        <a href="#notices">Hostel Notices</a>
+        <a href="/api/logout">Logout</a>
+    </aside>
+
+    <main class="main">
+
+        <header class="topbar">
+            <h2>Maintenance Dashboard</h2>
+            <span class="role">MAINTENANCE STAFF</span>
+        </header>
+
+        <section class="welcome">
+            <h1>Welcome, Maintenance Staff!</h1>
+            <p>View and update maintenance tasks assigned to you.</p>
+        </section>
+
+        <h2 class="section-title">Maintenance Services</h2>
+
+        <section class="cards">
+
+            
+<div class="card" id="complaints">
+    <h3>Assigned Complaints</h3>
+    <p>View complaints assigned to you by the Warden and check their details.</p>
+    <a href="/pages/maintenance-complaints.html" class="action">
+        View Assigned Complaints
+    </a>
+    <span class="status">Assigned Tasks Only</span>
+</div>
+
+<div class="card">
+    <h3>Update Task Status</h3>
+    <p>Update the progress of your assigned complaints.</p>
+    <a href="/pages/maintenance-complaints.html" class="action">
+        Update Tasks
+    </a>
+    <span class="status">Update Access</span>
+</div>
+
+        </section>
+
+        <section class="notice" id="notices">
+            <h3>Hostel Notices</h3>
+            <p>Read important announcements published by the Admin and Warden.</p>
+            <span class="status">View Only</span>
+        </section>
+
+    </main>
+
+</body>
+</html>
