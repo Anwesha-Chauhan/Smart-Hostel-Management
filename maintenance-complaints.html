@@ -1,0 +1,269 @@
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Assigned Complaints - Smart Hostel</title>
+    <link rel="stylesheet" href="../css/style.css">
+
+    <style>
+        .container {
+            max-width: 1200px;
+            margin: 30px auto;
+            padding: 20px;
+        }
+
+        .summary {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
+            gap: 15px;
+            margin: 25px 0;
+        }
+
+        .summary-card {
+            background: white;
+            padding: 20px;
+            border-radius: 10px;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.06);
+        }
+
+        .summary-card h3 {
+            font-size: 14px;
+            color: #68776e;
+        }
+
+        .summary-card p {
+            font-size: 25px;
+            font-weight: bold;
+            margin-top: 10px;
+        }
+
+        .table-wrapper {
+            overflow-x: auto;
+        }
+
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            background: white;
+        }
+
+        th, td {
+            padding: 12px;
+            border: 1px solid #ddd;
+            text-align: left;
+        }
+
+        th {
+            background: #f2f2f2;
+        }
+
+        select {
+            padding: 8px;
+            border: 1px solid #ccc;
+            border-radius: 5px;
+        }
+
+        button {
+            padding: 8px 13px;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+        }
+
+        .message {
+            margin: 15px 0;
+            font-weight: 600;
+        }
+
+        .refresh-button {
+            margin: 15px 0;
+        }
+    </style>
+</head>
+
+<body>
+
+<div class="container">
+
+    <h2>Assigned Complaints</h2>
+    <p>View your assigned maintenance complaints and update their progress.</p>
+
+    <section class="summary">
+        <div class="summary-card">
+            <h3>Total Assigned</h3>
+            <p id="totalCount">0</p>
+        </div>
+
+        <div class="summary-card">
+            <h3>Pending</h3>
+            <p id="pendingCount">0</p>
+        </div>
+
+        <div class="summary-card">
+            <h3>In Progress</h3>
+            <p id="progressCount">0</p>
+        </div>
+
+        <div class="summary-card">
+            <h3>Resolved</h3>
+            <p id="resolvedCount">0</p>
+        </div>
+    </section>
+
+    <button type="button" class="action refresh-button" onclick="loadComplaints()">
+        Refresh Complaints
+    </button>
+
+    <p id="message" class="message"></p>
+
+    <div class="table-wrapper">
+        <table>
+            <thead>
+                <tr>
+                    <th>Complaint ID</th>
+                    <th>Student</th>
+                    <th>Category</th>
+                    <th>Description</th>
+                    <th>Status</th>
+                    <th>Update Status</th>
+                    <th>Date</th>
+                </tr>
+            </thead>
+
+            <tbody id="complaintTableBody">
+                <tr>
+                    <td colspan="7">Loading complaints...</td>
+                </tr>
+            </tbody>
+        </table>
+    </div>
+
+    <p style="margin-top: 25px;">
+        <a href="/dashboards/maintenance.html">Back to Dashboard</a>
+    </p>
+
+</div>
+
+<script>
+    const tableBody = document.getElementById("complaintTableBody");
+    const message = document.getElementById("message");
+
+    function escapeHTML(value) {
+        return String(value ?? "").replace(/[&<>"']/g, function (char) {
+            return {
+                "&": "&amp;",
+                "<": "&lt;",
+                ">": "&gt;",
+                '"': "&quot;",
+                "'": "&#039;"
+            }[char];
+        });
+    }
+
+    async function loadComplaints() {
+        message.textContent = "Loading complaints...";
+
+        try {
+            const response = await fetch("/api/maintenance/complaints", {
+                method: "GET",
+                credentials: "same-origin",
+                cache: "no-store"
+            });
+
+            const data = await response.json();
+
+            if (!response.ok || !data.success) {
+                throw new Error(data.message || "Could not load complaints.");
+            }
+
+            const complaints = data.complaints || [];
+
+            document.getElementById("totalCount").textContent = complaints.length;
+            document.getElementById("pendingCount").textContent =
+                complaints.filter(c => c.status === "Pending").length;
+            document.getElementById("progressCount").textContent =
+                complaints.filter(c => c.status === "In Progress").length;
+            document.getElementById("resolvedCount").textContent =
+                complaints.filter(c => c.status === "Resolved").length;
+
+            if (complaints.length === 0) {
+                tableBody.innerHTML =
+                    '<tr><td colspan="7">No complaints assigned to you.</td></tr>';
+                message.textContent = "";
+                return;
+            }
+
+            tableBody.innerHTML = complaints.map(complaint => `
+                <tr>
+                    <td>${escapeHTML(complaint.complaintId)}</td>
+                    <td>${escapeHTML(complaint.studentName)}</td>
+                    <td>${escapeHTML(complaint.category)}</td>
+                    <td>${escapeHTML(complaint.description)}</td>
+                    <td>${escapeHTML(complaint.status)}</td>
+                    <td>
+                        <select id="status-${Number(complaint.complaintId)}">
+                            <option value="Pending" ${complaint.status === "Pending" ? "selected" : ""}>Pending</option>
+                            <option value="In Progress" ${complaint.status === "In Progress" ? "selected" : ""}>In Progress</option>
+                            <option value="Resolved" ${complaint.status === "Resolved" ? "selected" : ""}>Resolved</option>
+                        </select>
+                        <button type="button"
+                            onclick="updateStatus(${Number(complaint.complaintId)})">
+                            Save
+                        </button>
+                    </td>
+                    <td>${escapeHTML(complaint.createdAt)}</td>
+                </tr>
+            `).join("");
+
+            message.textContent = "";
+
+        } catch (error) {
+            tableBody.innerHTML =
+                '<tr><td colspan="7">Could not load assigned complaints.</td></tr>';
+            message.textContent = error.message;
+            console.error(error);
+        }
+    }
+
+    async function updateStatus(complaintId) {
+        const status = document.getElementById(
+            "status-" + complaintId
+        ).value;
+
+        message.textContent = "Updating complaint status...";
+
+        try {
+            const formData = new URLSearchParams();
+            formData.append("complaintId", complaintId);
+            formData.append("status", status);
+
+            const response = await fetch("/api/complaints/status", {
+                method: "POST",
+                credentials: "same-origin",
+                headers: {
+                    "Content-Type": "application/x-www-form-urlencoded"
+                },
+                body: formData
+            });
+
+            const data = await response.json();
+
+            if (!response.ok || !data.success) {
+                throw new Error(data.message || "Could not update status.");
+            }
+
+            message.textContent = "Complaint status updated successfully!";
+            await loadComplaints();
+
+        } catch (error) {
+            message.textContent = error.message;
+        }
+    }
+
+    loadComplaints();
+</script>
+
+</body>
+</html>
