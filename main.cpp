@@ -17,6 +17,7 @@ using namespace std;
 
 int main()
 {
+    cout << "Smart Hostel Application Started!" << endl;
     try
     {
         unique_ptr<sql::Connection> con = connectDatabase();
