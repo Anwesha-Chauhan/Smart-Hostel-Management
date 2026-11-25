@@ -1,0 +1,164 @@
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Room Management - Smart Hostel</title>
+    <link rel="stylesheet" href="../css/style.css">
+</head>
+<body>
+
+<div class="dashboard">
+
+    <aside class="sidebar">
+        <h2>Smart Hostel</h2>
+
+        <nav>
+            <a href="../index.html" id="dashboardLink">Dashboard</a>
+            <a href="students.html" id="usersNavLink">Students & Staff</a>
+            <a href="rooms.html" class="active">Room Management</a>
+            <a href="allocation.html" id="allocationNavLink">Room Allocation</a>
+        </nav>
+    </aside>
+
+    <main class="main-content">
+
+        <header class="topbar">
+            <h1>Room Management</h1>
+            <p>Manage hostel rooms and availability</p>
+        </header>
+
+        <section class="student-toolbar">
+
+            <input
+                type="text"
+                id="roomSearch"
+                placeholder="Search by room number or block..."
+            >
+
+            <button onclick="showAllRooms()">View All Rooms</button>
+
+            <button
+                class="available-btn"
+                onclick="showAvailableRooms()"
+            >
+                View Available Rooms
+            </button>
+
+            <button
+                class="add-btn"
+                id="addRoomButton"
+                onclick="openRoomForm()"
+            >
+                + Add Room
+            </button>
+
+        </section>
+
+        <p id="roomCount" class="room-count"></p>
+
+        <section class="table-container">
+
+            <table id="roomTable">
+
+                <thead>
+                    <tr>
+                        <th>Room ID</th>
+                        <th>Room Number</th>
+                        <th>Block</th>
+                        <th>Sharing Type</th>
+                        <th>Capacity</th>
+                        <th>Occupancy</th>
+                        <th>Monthly Price</th>
+                        <th>Status</th>
+                        <th id="roomActionsHeading">Actions</th>
+                    </tr>
+                </thead>
+
+                <tbody id="roomTableBody">
+                    <tr>
+                        <td colspan="9">Loading rooms...</td>
+                    </tr>
+                </tbody>
+
+            </table>
+
+        </section>
+
+    </main>
+</div>
+
+
+<!-- Add/Edit Room Modal -->
+
+<div id="roomModal" class="modal">
+
+    <div class="modal-content">
+
+        <h2 id="roomModalTitle">Add Room</h2>
+
+        <form id="roomForm">
+
+            <input type="hidden" id="roomId">
+
+            <label>Room Number</label>
+            <input
+                type="text"
+                id="roomNumber"
+                placeholder="Example: A-104"
+                required
+            >
+
+            <label>Block</label>
+            <input
+                type="text"
+                id="roomBlock"
+                placeholder="Example: A"
+                required
+            >
+
+            <label>Sharing Type</label>
+            <select id="roomCapacity" required>
+                <option value="1">Single Room</option>
+                <option value="2">Double Sharing</option>
+                <option value="3">Triple Sharing</option>
+            </select>
+
+            <label>Current Occupancy</label>
+            <input
+                type="number"
+                id="roomOccupancy"
+                value="0"
+                readonly
+            >
+
+            <label>Status</label>
+            <select id="roomStatus" required>
+                <option value="Available">Available</option>
+                <option value="Full">Full</option>
+                <option value="Maintenance">Maintenance</option>
+            </select>
+
+            <div class="modal-buttons">
+
+                <button type="submit" class="add-btn">
+                    Save Room
+                </button>
+
+                <button type="button" onclick="closeRoomForm()">
+                    Cancel
+                </button>
+
+            </div>
+
+        </form>
+
+    </div>
+</div>
+
+
+<script src="../js/script.js"></script>
+
+</body>
+</html>
