@@ -1,0 +1,521 @@
+
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+    font-family: Arial, sans-serif;
+}
+
+body {
+    background: #f4f8f5;
+    color: #26382c;
+}
+
+.container {
+    display: flex;
+    min-height: 100vh;
+}
+
+/* Sidebar */
+.sidebar {
+    width: 250px;
+    background: #145c3a;
+    color: white;
+    padding: 25px 18px;
+    display: flex;
+    flex-direction: column;
+}
+
+.logo {
+    margin-bottom: 35px;
+}
+
+.logo h2 {
+    font-size: 28px;
+    letter-spacing: 2px;
+}
+
+.logo p {
+    font-size: 12px;
+    color: #c5e3d0;
+    margin-top: 5px;
+}
+
+.sidebar nav {
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+}
+
+.sidebar nav a,
+.sidebar-bottom a {
+    color: #e2f2e8;
+    text-decoration: none;
+    padding: 13px;
+    border-radius: 7px;
+    font-size: 14px;
+}
+
+.sidebar nav a:hover,
+.sidebar nav a.active {
+    background: #278253;
+    color: white;
+}
+
+.sidebar-bottom {
+    margin-top: auto;
+}
+
+/* Main content */
+.main-content {
+    flex: 1;
+    padding: 30px;
+    min-width: 0;
+}
+
+.topbar {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 30px;
+}
+
+.topbar h2 {
+    font-size: 26px;
+    color: #174c32;
+}
+
+.topbar p {
+    color: #718078;
+    margin-top: 7px;
+    font-size: 14px;
+}
+
+.profile {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    font-weight: bold;
+}
+
+.avatar {
+    width: 40px;
+    height: 40px;
+    background: #d8eee0;
+    color: #145c3a;
+    border-radius: 50%;
+    display: grid;
+    place-items: center;
+}
+
+/* Statistics */
+.stats {
+    display: grid;
+    grid-template-columns: repeat(4, 1fr);
+    gap: 20px;
+}
+
+.stat-card {
+    background: white;
+    padding: 23px;
+    border-radius: 12px;
+    border: 1px solid #e5eee7;
+    box-shadow: 0 3px 12px #163d2510;
+}
+
+.stat-card p {
+    color: #64756a;
+    font-size: 14px;
+}
+
+.stat-card h2 {
+    color: #176b42;
+    font-size: 30px;
+    margin: 15px 0 8px;
+}
+
+.stat-card span {
+    color: #89968d;
+    font-size: 12px;
+}
+
+/* Sections */
+.section {
+    margin-top: 35px;
+}
+
+.section h2 {
+    color: #174c32;
+    font-size: 20px;
+    margin-bottom: 18px;
+}
+
+/* Quick actions */
+.actions {
+    display: flex;
+    gap: 15px;
+    flex-wrap: wrap;
+}
+
+.actions button {
+    background: #218452;
+    border: none;
+    padding: 13px 20px;
+    color: white;
+    border-radius: 7px;
+    cursor: pointer;
+}
+
+.actions button:hover {
+    background: #145c3a;
+}
+
+/* Table */
+.table-container {
+    background: white;
+    border-radius: 12px;
+    overflow-x: auto;
+    border: 1px solid #e5eee7;
+}
+
+table {
+    width: 100%;
+    border-collapse: collapse;
+    min-width: 500px;
+}
+
+th, td {
+    padding: 17px;
+    text-align: left;
+    border-bottom: 1px solid #edf1ee;
+    font-size: 14px;
+}
+
+th {
+    background: #eaf4ed;
+    color: #245a3b;
+}
+
+.status {
+    padding: 6px 11px;
+    border-radius: 20px;
+    font-size: 12px;
+}
+
+.success {
+    background: #dcf5e4;
+    color: #176b42;
+}
+
+.pending {
+    background: #fff1d6;
+    color: #98620a;
+}
+
+/* Responsive */
+@media (max-width: 1000px) {
+    .stats {
+        grid-template-columns: repeat(2, 1fr);
+    }
+}
+
+@media (max-width: 650px) {
+    .sidebar {
+        width: 175px;
+        padding: 15px 10px;
+    }
+
+    .main-content {
+        padding: 18px;
+    }
+
+    .stats {
+        grid-template-columns: 1fr;
+    }
+
+    .topbar {
+        align-items: flex-start;
+        gap: 15px;
+    }
+}
+
+/* Student Management */
+
+.student-toolbar {
+    display: flex;
+    justify-content: space-between;
+    gap: 15px;
+    margin-bottom: 22px;
+}
+
+.student-toolbar input {
+    width: 350px;
+    padding: 13px;
+    border: 1px solid #d7e4da;
+    border-radius: 7px;
+    outline: none;
+}
+
+.student-toolbar input:focus {
+    border-color: #218452;
+}
+
+.student-toolbar button,
+.form-buttons button {
+    background: #218452;
+    color: white;
+    border: none;
+    padding: 12px 20px;
+    border-radius: 7px;
+    cursor: pointer;
+}
+
+.edit-btn, .delete-btn {
+    padding: 7px 12px;
+    border: none;
+    border-radius: 5px;
+    cursor: pointer;
+}
+
+.edit-btn {
+    background: #dcefe3;
+    color: #176b42;
+}
+
+.delete-btn {
+    background: #ffe2e2;
+    color: #c0392b;
+}
+
+/* Modal */
+
+.modal {
+    display: none;
+    position: fixed;
+    inset: 0;
+    background: #00000070;
+    justify-content: center;
+    align-items: center;
+    padding: 15px;
+}
+
+.modal-content {
+    background: white;
+    padding: 30px;
+    width: 400px;
+    max-width: 100%;
+    border-radius: 12px;
+}
+
+.modal-content h2 {
+    color: #145c3a;
+    margin-bottom: 22px;
+}
+
+.modal-content form {
+    display: flex;
+    flex-direction: column;
+    gap: 15px;
+}
+
+.modal-content input {
+    padding: 12px;
+    border: 1px solid #d7e4da;
+    border-radius: 6px;
+}
+
+.form-buttons {
+    display: flex;
+    gap: 10px;
+}
+
+.cancel-btn {
+    background: #777 !important;
+}
+
+@media (max-width: 650px) {
+    .student-toolbar {
+        flex-direction: column;
+    }
+
+    .student-toolbar input {
+        width: 100%;
+    }
+}
+
+
+/* Room Management */
+
+.available-btn {
+    background: #168653;
+    color: white;
+    border: none;
+    padding: 10px 15px;
+    border-radius: 6px;
+    cursor: pointer;
+}
+
+.room-count {
+    margin: 15px 0;
+    color: #555;
+    font-weight: 600;
+}
+
+.status {
+    padding: 5px 10px;
+    border-radius: 15px;
+    font-size: 12px;
+    font-weight: 600;
+}
+
+.status.available {
+    background: #d9f5e5;
+    color: #168653;
+}
+
+.status.full {
+    background: #ffe0e0;
+    color: #c0392b;
+}
+
+.status.maintenance {
+    background: #fff0cf;
+    color: #a66b00;
+}
+
+.edit-btn {
+    background: #e4f0ff;
+    color: #2563a6;
+    border: none;
+    padding: 6px 10px;
+    border-radius: 5px;
+    cursor: pointer;
+}
+
+.delete-btn {
+    background: #ffe5e5;
+    color: #c0392b;
+    border: none;
+    padding: 6px 10px;
+    border-radius: 5px;
+    cursor: pointer;
+}
+
+.modal-buttons {
+    display: flex;
+    gap: 10px;
+    margin-top: 18px;
+}
+
+.modal-content label {
+    display: block;
+    margin-top: 12px;
+    margin-bottom: 5px;
+    font-weight: 600;
+}
+
+.modal-content input,
+.modal-content select {
+    width: 100%;
+    padding: 10px;
+    border: 1px solid #ddd;
+    border-radius: 6px;
+    box-sizing: border-box;
+}
+
+#roomTable td {
+    vertical-align: middle;
+}
+
+
+/* Room Allocation Page */
+
+.allocation-form-section {
+    background: white;
+    padding: 25px;
+    border-radius: 10px;
+    margin: 20px 0;
+    box-shadow: 0 2px 8px rgba(0,0,0,0.05);
+}
+
+.allocation-form-section h2 {
+    margin-bottom: 20px;
+}
+
+.allocation-form-section label {
+    display: block;
+    margin: 12px 0 6px;
+    font-weight: 600;
+}
+
+.allocation-form-section input,
+.allocation-form-section select {
+    width: 100%;
+    padding: 11px;
+    border: 1px solid #ddd;
+    border-radius: 6px;
+    box-sizing: border-box;
+    margin-bottom: 10px;
+}
+
+.allocation-form-section button {
+    margin-top: 12px;
+}
+
+.allocation-summary {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 18px;
+    margin: 20px 0;
+}
+
+.allocation-card {
+    background: white;
+    padding: 20px;
+    border-radius: 10px;
+    box-shadow: 0 2px 8px rgba(0,0,0,0.05);
+}
+
+.allocation-card h3 {
+    color: #666;
+    font-size: 15px;
+}
+
+.allocation-card p {
+    font-size: 28px;
+    font-weight: bold;
+    color: #168653;
+    margin-top: 10px;
+}
+
+.allocation-status {
+    padding: 5px 10px;
+    border-radius: 15px;
+    font-size: 12px;
+    font-weight: 600;
+}
+
+.allocation-status.active {
+    background: #d9f5e5;
+    color: #168653;
+}
+
+.allocation-status.vacated {
+    background: #eeeeee;
+    color: #555;
+}
+
+.vacate-btn {
+    background: #ffe5e5;
+    color: #c0392b;
+    border: none;
+    padding: 7px 10px;
+    border-radius: 5px;
+    cursor: pointer;
+}
+
+@media (max-width: 700px) {
+    .allocation-summary {
+        grid-template-columns: 1fr;
+    }
+}
