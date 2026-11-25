@@ -1,0 +1,466 @@
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Fee Management - Smart Hostel</title>
+
+    <link rel="stylesheet" href="../css/style.css">
+
+    <style>
+        .fee-container {
+            padding: 25px;
+        }
+
+        .fee-summary {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(170px, 1fr));
+            gap: 15px;
+            margin: 20px 0;
+        }
+
+        .fee-card {
+            background: white;
+            padding: 20px;
+            border-radius: 10px;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.08);
+        }
+
+        .fee-card h3 {
+            font-size: 15px;
+            color: #666;
+            margin-bottom: 10px;
+        }
+
+        .fee-card p {
+            font-size: 23px;
+            font-weight: bold;
+            color: #222;
+        }
+
+        .fee-section {
+            background: white;
+            padding: 22px;
+            margin-top: 22px;
+            border-radius: 10px;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.08);
+        }
+
+        .fee-section h2 {
+            margin-bottom: 18px;
+        }
+
+        .fee-form {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
+            gap: 15px;
+        }
+
+        .fee-form input {
+            padding: 11px;
+            border: 1px solid #ccc;
+            border-radius: 6px;
+            width: 100%;
+        }
+
+        .fee-form button, .search-controls button {
+            padding: 11px 18px;
+            border: none;
+            border-radius: 6px;
+            background: #263b80;
+            color: white;
+            cursor: pointer;
+        }
+
+        .search-controls {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 10px;
+            margin-bottom: 18px;
+        }
+
+        .search-controls input {
+            padding: 10px;
+            border: 1px solid #ccc;
+            border-radius: 6px;
+        }
+
+        .fee-table-wrapper {
+            overflow-x: auto;
+        }
+
+        .fee-table {
+            width: 100%;
+            border-collapse: collapse;
+            min-width: 850px;
+        }
+
+        .fee-table th, .fee-table td {
+            padding: 12px;
+            border-bottom: 1px solid #ddd;
+            text-align: left;
+        }
+
+        .fee-table th {
+            background: #263b80;
+            color: white;
+        }
+
+        .status {
+            padding: 5px 10px;
+            border-radius: 15px;
+            font-size: 12px;
+            font-weight: bold;
+        }
+
+        .Paid {
+            background: #d4edda;
+            color: #155724;
+        }
+
+        .Pending {
+            background: #fff3cd;
+            color: #856404;
+        }
+
+        .Overdue {
+            background: #f8d7da;
+            color: #721c24;
+        }
+
+        #feeMessage {
+            margin-top: 12px;
+            font-weight: bold;
+        }
+
+        @media(max-width: 600px) {
+            .fee-container {
+                padding: 12px;
+            }
+        }
+    </style>
+</head>
+
+<body>
+
+<div class="dashboard">
+
+    <aside class="sidebar">
+        <h2>Smart Hostel</h2>
+
+        <nav>
+            <a href="/index.html">Dashboard</a>
+            <a href="/pages/rooms.html">Room Management</a>
+            <a href="/pages/allocation.html">Room Allocation</a>
+            <a href="/pages/availability.html">Room Availability</a>
+            <a href="/pages/fees.html">Fee Management</a>
+            <a href="/api/logout">Logout</a>
+        </nav>
+    </aside>
+
+    <main class="main-content">
+
+        <div class="fee-container">
+
+            <h1>Fee Management</h1>
+            <p>Manage student fee records and monitor hostel payments.</p>
+
+            <!-- SUMMARY -->
+            <div class="fee-summary">
+
+                <div class="fee-card">
+                    <h3>Total Fee Records</h3>
+                    <p id="totalRecords">0</p>
+                </div>
+
+                <div class="fee-card">
+                    <h3>Total Fee Amount</h3>
+                    <p id="totalAmount">₹0.00</p>
+                </div>
+
+                <div class="fee-card">
+                    <h3>Paid Fees</h3>
+                    <p id="paidCount">0</p>
+                </div>
+
+                <div class="fee-card">
+                    <h3>Pending Fees</h3>
+                    <p id="pendingCount">0</p>
+                </div>
+
+                <div class="fee-card">
+                    <h3>Overdue Fees</h3>
+                    <p id="overdueCount">0</p>
+                </div>
+
+            </div>
+
+            <!-- ADD FEE -->
+            <section class="fee-section">
+
+                <h2>Add Fee Record</h2>
+
+                <form id="feeForm" class="fee-form">
+
+                    <input
+                        type="number"
+                        id="studentId"
+                        placeholder="Student User ID"
+                        min="1"
+                        required
+                    >
+
+                    <input
+                        type="number"
+                        id="amount"
+                        placeholder="Fee Amount (₹)"
+                        min="0.01"
+                        step="0.01"
+                        required
+                    >
+
+                    <input
+                        type="date"
+                        id="dueDate"
+                        required
+                    >
+
+                    <button type="submit">Add Fee</button>
+
+                </form>
+
+                <p id="feeMessage"></p>
+
+            </section>
+
+            <!-- FEE RECORDS -->
+            <section class="fee-section">
+
+                <h2>Student Fee Records</h2>
+
+                <div class="search-controls">
+
+                    <input
+                        type="number"
+                        id="searchStudentId"
+                        placeholder="Search by Student ID"
+                        min="1"
+                    >
+
+                    <button type="button" id="searchButton">
+                        Search
+                    </button>
+
+                    <button type="button" id="resetButton">
+                        Show All
+                    </button>
+
+                </div>
+
+                <div class="fee-table-wrapper">
+
+                    <table class="fee-table">
+
+                        <thead>
+                            <tr>
+                                <th>Fee ID</th>
+                                <th>Student ID</th>
+                                <th>Student Name</th>
+                                <th>Email</th>
+                                <th>Amount</th>
+                                <th>Due Date</th>
+                                <th>Payment Date</th>
+                                <th>Status</th>
+                            </tr>
+                        </thead>
+
+                        <tbody id="feeTableBody">
+                            <tr>
+                                <td colspan="8">Loading fee records...</td>
+                            </tr>
+                        </tbody>
+
+                    </table>
+
+                </div>
+
+            </section>
+
+        </div>
+
+    </main>
+
+</div>
+
+<script>
+    const feeTableBody = document.getElementById("feeTableBody");
+    const feeMessage = document.getElementById("feeMessage");
+
+    let currentFees = [];
+
+    function escapeHTML(value) {
+        return String(value ?? "").replace(/[&<>"']/g, char => ({
+            "&": "&amp;",
+            "<": "&lt;",
+            ">": "&gt;",
+            '"': "&quot;",
+            "'": "&#39;"
+        })[char]);
+    }
+
+    function formatAmount(amount) {
+        return "₹" + Number(amount).toLocaleString("en-IN", {
+            minimumFractionDigits: 2,
+            maximumFractionDigits: 2
+        });
+    }
+
+    function updateSummary(fees) {
+        const totalAmount = fees.reduce(
+            (sum, fee) => sum + Number(fee.amount), 0
+        );
+
+        document.getElementById("totalRecords").textContent = fees.length;
+
+        document.getElementById("totalAmount").textContent =
+            formatAmount(totalAmount);
+
+        document.getElementById("paidCount").textContent =
+            fees.filter(f => f.status === "Paid").length;
+
+        document.getElementById("pendingCount").textContent =
+            fees.filter(f => f.status === "Pending").length;
+
+        document.getElementById("overdueCount").textContent =
+            fees.filter(f => f.status === "Overdue").length;
+    }
+
+    function displayFees(fees) {
+        currentFees = fees;
+
+        updateSummary(fees);
+
+        if (fees.length === 0) {
+            feeTableBody.innerHTML =
+                '<tr><td colspan="8">No fee records found.</td></tr>';
+            return;
+        }
+
+        feeTableBody.innerHTML = fees.map(fee => `
+            <tr>
+                <td>${fee.feeId}</td>
+                <td>${fee.userId}</td>
+                <td>${escapeHTML(fee.studentName)}</td>
+                <td>${escapeHTML(fee.studentEmail)}</td>
+                <td>${formatAmount(fee.amount)}</td>
+                <td>${escapeHTML(fee.dueDate)}</td>
+                <td>${escapeHTML(fee.paymentDate || "Not Paid")}</td>
+                <td>
+                    <span class="status ${escapeHTML(fee.status)}">
+                        ${escapeHTML(fee.status)}
+                    </span>
+                </td>
+            </tr>
+        `).join("");
+    }
+
+    async function loadFees(studentId = "") {
+        feeTableBody.innerHTML =
+            '<tr><td colspan="8">Loading fee records...</td></tr>';
+
+        try {
+            let url = "/api/admin/fees";
+
+            if (studentId) {
+                url += "?studentId=" + encodeURIComponent(studentId);
+            }
+
+            const response = await fetch(url, {
+                credentials: "same-origin",
+                cache: "no-store"
+            });
+
+            const data = await response.json();
+
+            if (!response.ok || !data.success) {
+                throw new Error(data.message || "Could not load fee records.");
+            }
+
+            displayFees(data.fees);
+
+        } catch (error) {
+            feeTableBody.innerHTML =
+                '<tr><td colspan="8">' +
+                escapeHTML(error.message) +
+                '</td></tr>';
+        }
+    }
+
+    document.getElementById("feeForm").addEventListener("submit", async function(e) {
+        e.preventDefault();
+
+        feeMessage.textContent = "Adding fee record...";
+
+        const formData = new URLSearchParams();
+
+        formData.append("studentId",
+            document.getElementById("studentId").value);
+
+        formData.append("amount",
+            document.getElementById("amount").value);
+
+        formData.append("dueDate",
+            document.getElementById("dueDate").value);
+
+        try {
+            const response = await fetch("/api/admin/fees", {
+                method: "POST",
+                credentials: "same-origin",
+                headers: {
+                    "Content-Type": "application/x-www-form-urlencoded"
+                },
+                body: formData
+            });
+
+            const data = await response.json();
+
+            if (!response.ok || !data.success) {
+                throw new Error(data.message || "Could not add fee.");
+            }
+
+            feeMessage.textContent = data.message;
+            feeMessage.style.color = "green";
+
+            this.reset();
+
+            await loadFees();
+
+        } catch (error) {
+            feeMessage.textContent = error.message;
+            feeMessage.style.color = "red";
+        }
+    });
+
+    document.getElementById("searchButton").addEventListener("click", function() {
+        const studentId =
+            document.getElementById("searchStudentId").value.trim();
+
+        if (!studentId || Number(studentId) <= 0) {
+            alert("Enter a valid Student ID.");
+            return;
+        }
+
+        loadFees(studentId);
+    });
+
+    document.getElementById("resetButton").addEventListener("click", function() {
+        document.getElementById("searchStudentId").value = "";
+        loadFees();
+    });
+
+    loadFees();
+</script>
+
+</body>
+</html>
