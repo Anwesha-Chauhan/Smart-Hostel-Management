@@ -1,0 +1,231 @@
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Student Dashboard - Smart Hostel</title>
+
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: Arial, sans-serif;
+        }
+
+        body {
+            background: #f4f7f5;
+            color: #26352d;
+        }
+
+        .sidebar {
+            width: 245px;
+            height: 100vh;
+            background: #174d35;
+            color: white;
+            position: fixed;
+            padding: 25px 18px;
+        }
+
+        .sidebar h2 {
+            margin-bottom: 35px;
+            font-size: 22px;
+        }
+
+        .sidebar a {
+            display: block;
+            color: white;
+            text-decoration: none;
+            padding: 13px;
+            margin: 7px 0;
+            border-radius: 6px;
+        }
+
+        .sidebar a:hover,
+        .sidebar a.active {
+            background: #28734f;
+        }
+
+        .main {
+            margin-left: 245px;
+            padding: 30px;
+        }
+
+        .topbar {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 30px;
+        }
+
+        .role {
+            background: #dcefe3;
+            color: #174d35;
+            padding: 9px 16px;
+            border-radius: 20px;
+            font-weight: bold;
+        }
+
+        .welcome {
+            margin-bottom: 25px;
+        }
+
+        .welcome p {
+            color: #68776e;
+            margin-top: 8px;
+        }
+
+        .section-title {
+            margin: 25px 0 15px;
+        }
+
+        .cards {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+            gap: 20px;
+        }
+
+        .card {
+            background: white;
+            padding: 23px;
+            border-radius: 10px;
+            box-shadow: 0 2px 9px rgba(0,0,0,0.06);
+            border-left: 5px solid #28734f;
+        }
+
+        .card h3 {
+            margin-bottom: 12px;
+            font-size: 17px;
+        }
+
+        .card p {
+            color: #68776e;
+            font-size: 14px;
+            line-height: 1.5;
+        }
+
+        .action {
+            display: inline-block;
+            margin-top: 15px;
+            padding: 9px 14px;
+            background: #28734f;
+            color: white;
+            text-decoration: none;
+            border-radius: 5px;
+            font-size: 13px;
+        }
+
+        .action:hover {
+            background: #174d35;
+        }
+
+        .notice {
+            background: white;
+            padding: 22px;
+            border-radius: 10px;
+            margin-top: 25px;
+        }
+
+        @media (max-width: 700px) {
+            .sidebar {
+                width: 100%;
+                height: auto;
+                position: relative;
+            }
+
+            .main {
+                margin-left: 0;
+                padding: 20px;
+            }
+        }
+    </style>
+</head>
+
+<body>
+
+    <aside class="sidebar">
+        <h2>Smart Hostel</h2>
+
+        <a href="#" class="active">Dashboard</a>
+        <a href="#room">Room Allocation</a>
+        <a href="#fees">My Fees</a>
+        <a href="#leave">Apply for Leave</a>
+        <a href="#visitors">My Visitors</a>
+        <a href="#attendance">My Attendance</a>
+        <a href="#complaints">Complaints</a>
+        <a href="#notices">Notices</a>
+        <a href="/api/logout">Logout</a>
+    </aside>
+
+    <main class="main">
+
+        <header class="topbar">
+            <h2>Student Dashboard</h2>
+            <span class="role">STUDENT</span>
+        </header>
+
+        <section class="welcome">
+            <h1>Welcome, Student!</h1>
+            <p>Access your hostel information and manage your student activities.</p>
+        </section>
+
+        <h2 class="section-title">My Hostel Services</h2>
+
+        <section class="cards">
+
+            <div class="card" id="room">
+            <h3>Room Allocation</h3>
+            <p>Check room availability, select your preferred room type and block, and submit an allocation request.</p>
+            <a href="../pages/allocation.html" class="action">Request a Room</a>
+            </div>
+
+            <div class="card" id="fees">
+    <h3>My Fees</h3>
+    <p>View your hostel fee details, payment status and outstanding dues.</p>
+    <a href="/pages/my-fees.html" class="action">View Fees</a>
+</div>
+
+            <div class="card" id="leave">
+    <h3>Apply for Leave</h3>
+    <p>Submit a leave application and check its approval status.</p>
+    <a href="/pages/apply-leave.html" class="action">
+        Apply Now
+    </a>
+</div>
+            <div class="card" id="visitors">
+    <h3>My Visitors</h3>
+    <p>View visitor records associated with your hostel account.</p>
+    <a href="/pages/my-visitors.html" class="action">
+        View Visitors
+    </a>
+</div>
+
+            <div class="card" id="attendance">
+                <h3>My Attendance</h3>
+                <p>Check your hostel attendance records and attendance history.</p>
+                <a href="#" class="action">View Attendance</a>
+            </div>
+
+            
+<div class="card" id="complaints">
+    <h3>Complaints</h3>
+    <p>Submit a maintenance complaint and track its progress.</p>
+    <a href="/pages/complaint-submission.html" class="action">
+        Submit Complaint
+    </a>
+</div>
+
+
+        </section>
+
+        <section class="notice" id="notices">
+            <h3>Hostel Notices</h3>
+            <p>Stay updated with important announcements from the Admin and Warden.</p>
+            <a href="#" class="action">View Notices</a>
+        </section>
+
+    </main>
+
+</body>
+</html>
