@@ -1,0 +1,255 @@
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Submit Complaint - Smart Hostel</title>
+    <link rel="stylesheet" href="../css/style.css">
+
+    <style>
+        .complaint-container {
+            max-width: 1100px;
+            margin: 30px auto;
+            padding: 20px;
+        }
+
+        .complaint-form {
+            background: white;
+            padding: 25px;
+            border-radius: 10px;
+            margin-bottom: 30px;
+        }
+
+        .complaint-form label {
+            display: block;
+            margin: 15px 0 7px;
+            font-weight: 600;
+        }
+
+        .complaint-form select,
+        .complaint-form textarea {
+            width: 100%;
+            padding: 11px;
+            border: 1px solid #ccc;
+            border-radius: 6px;
+            box-sizing: border-box;
+        }
+
+        .complaint-form textarea {
+            min-height: 120px;
+            resize: vertical;
+        }
+
+        .complaint-form button {
+            margin-top: 18px;
+            padding: 11px 22px;
+            border: none;
+            border-radius: 6px;
+            cursor: pointer;
+        }
+
+        .complaint-table {
+            width: 100%;
+            border-collapse: collapse;
+            background: white;
+        }
+
+        .complaint-table th,
+        .complaint-table td {
+            padding: 12px;
+            border: 1px solid #ddd;
+            text-align: left;
+        }
+
+        .complaint-table th {
+            background: #f2f2f2;
+        }
+
+        .complaint-message {
+            margin-top: 15px;
+            font-weight: 600;
+        }
+
+        .table-wrapper {
+            overflow-x: auto;
+        }
+    </style>
+</head>
+
+<body>
+
+<div class="complaint-container">
+
+    <h2>Complaint Management</h2>
+    <p>Submit hostel-related complaints and track their progress.</p>
+
+    <div class="complaint-form">
+        <h3>Submit New Complaint</h3>
+
+        <form id="complaintForm">
+
+            <label for="category">Complaint Category</label>
+            <select id="category" name="category" required>
+                <option value="">Select Category</option>
+                <option value="Room Maintenance">Room Maintenance</option>
+                <option value="Electrical">Electrical</option>
+                <option value="Plumbing">Plumbing</option>
+                <option value="Cleanliness">Cleanliness</option>
+                <option value="Food">Food</option>
+                <option value="Internet">Internet</option>
+                <option value="Other">Other</option>
+            </select>
+
+            <label for="description">Complaint Description</label>
+            <textarea
+                id="description"
+                name="description"
+                maxlength="5000"
+                placeholder="Describe your complaint..."
+                required
+            ></textarea>
+
+            <button type="submit" class="action" id="submitButton">
+                Submit Complaint
+            </button>
+
+            <p id="message" class="complaint-message"></p>
+
+        </form>
+    </div>
+
+    <h3>My Complaints</h3>
+
+    <div class="table-wrapper">
+        <table class="complaint-table">
+            <thead>
+                <tr>
+                    <th>Complaint ID</th>
+                    <th>Category</th>
+                    <th>Description</th>
+                    <th>Status</th>
+                    <th>Assigned Staff</th>
+                    <th>Date</th>
+                </tr>
+            </thead>
+
+            <tbody id="complaintTableBody">
+                <tr>
+                    <td colspan="6">Loading complaints...</td>
+                </tr>
+            </tbody>
+        </table>
+    </div>
+
+</div>
+
+<script>
+    const complaintForm = document.getElementById("complaintForm");
+    const message = document.getElementById("message");
+    const submitButton = document.getElementById("submitButton");
+    const tableBody = document.getElementById("complaintTableBody");
+
+    function escapeHTML(value) {
+        return String(value ?? "").replace(/[&<>"']/g, function (char) {
+            return {
+                "&": "&amp;",
+                "<": "&lt;",
+                ">": "&gt;",
+                '"': "&quot;",
+                "'": "&#039;"
+            }[char];
+        });
+    }
+
+    async function loadComplaints() {
+        try {
+            const response = await fetch("/api/student/complaints", {
+                method: "GET",
+                credentials: "same-origin",
+                cache: "no-store"
+            });
+
+            const data = await response.json();
+
+            if (!response.ok || !data.success) {
+                throw new Error(data.message || "Could not load complaints.");
+            }
+
+            const complaints = data.complaints || [];
+
+            if (complaints.length === 0) {
+                tableBody.innerHTML =
+                    '<tr><td colspan="6">No complaints submitted yet.</td></tr>';
+                return;
+            }
+
+            tableBody.innerHTML = complaints.map(complaint => `
+                <tr>
+                    <td>${escapeHTML(complaint.complaintId)}</td>
+                    <td>${escapeHTML(complaint.category)}</td>
+                    <td>${escapeHTML(complaint.description)}</td>
+                    <td>${escapeHTML(complaint.status)}</td>
+                    <td>${escapeHTML(complaint.assignedName || "Not Assigned")}</td>
+                    <td>${escapeHTML(complaint.createdAt)}</td>
+                </tr>
+            `).join("");
+
+        } catch (error) {
+            tableBody.innerHTML =
+                '<tr><td colspan="6">Could not load complaints.</td></tr>';
+            console.error(error);
+        }
+    }
+
+    complaintForm.addEventListener("submit", async function (event) {
+        event.preventDefault();
+
+        const category = document.getElementById("category").value;
+        const description = document.getElementById("description").value.trim();
+
+        if (!category || !description) {
+            message.textContent = "Please complete all fields.";
+            return;
+        }
+
+        submitButton.disabled = true;
+        message.textContent = "Submitting complaint...";
+
+        try {
+            const formData = new URLSearchParams();
+            formData.append("category", category);
+            formData.append("description", description);
+
+            const response = await fetch("/api/complaints", {
+                method: "POST",
+                credentials: "same-origin",
+                headers: {
+                    "Content-Type": "application/x-www-form-urlencoded"
+                },
+                body: formData
+            });
+
+            const data = await response.json();
+
+            if (!response.ok || !data.success) {
+                throw new Error(data.message || "Could not submit complaint.");
+            }
+
+            message.textContent = "Complaint submitted successfully!";
+            complaintForm.reset();
+
+            await loadComplaints();
+
+        } catch (error) {
+            message.textContent = error.message;
+        } finally {
+            submitButton.disabled = false;
+        }
+    });
+
+    loadComplaints();
+</script>
+
+</body>
+</html>
