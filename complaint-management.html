@@ -1,0 +1,437 @@
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Complaint Management - Smart Hostel</title>
+    <link rel="stylesheet" href="../css/style.css">
+
+    <style>
+        .summary {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(170px, 1fr));
+            gap: 18px;
+            margin: 22px 0;
+        }
+
+        .summary-card {
+            background: white;
+            padding: 20px;
+            border-radius: 10px;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.08);
+        }
+
+        .summary-card h3 {
+            margin-bottom: 10px;
+        }
+
+        .table-container {
+            background: white;
+            padding: 18px;
+            border-radius: 10px;
+            overflow-x: auto;
+        }
+
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            min-width: 1050px;
+        }
+
+        th, td {
+            padding: 12px;
+            text-align: left;
+            border-bottom: 1px solid #ddd;
+        }
+
+        th {
+            background: #f3f4f6;
+        }
+
+        .status {
+            font-weight: bold;
+        }
+
+        .Pending { color: #d97706; }
+        .In-Progress { color: #2563eb; }
+        .Resolved { color: green; }
+
+        .toolbar {
+            display: flex;
+            gap: 12px;
+            align-items: center;
+            flex-wrap: wrap;
+            margin: 15px 0;
+        }
+
+        .toolbar select,
+        .toolbar button,
+        .assign-select {
+            padding: 8px;
+        }
+
+        button {
+            cursor: pointer;
+        }
+
+        .assign-btn,
+        .update-btn {
+            border: none;
+            padding: 8px 12px;
+            border-radius: 5px;
+            color: white;
+            margin: 3px;
+        }
+
+        .assign-btn { background: #2563eb; }
+        .update-btn { background: #16a34a; }
+
+        .message {
+            margin: 12px 0;
+            font-weight: bold;
+        }
+
+        .action-area {
+            min-width: 190px;
+        }
+    </style>
+</head>
+
+<body>
+
+<div class="container">
+
+    <h2>Complaint Management</h2>
+    <p>Review student complaints and assign maintenance work.</p>
+
+    <div class="summary">
+
+        <div class="summary-card">
+            <h3>Total Complaints</h3>
+            <p id="totalComplaints">0</p>
+        </div>
+
+        <div class="summary-card">
+            <h3>Pending</h3>
+            <p id="pendingComplaints">0</p>
+        </div>
+
+        <div class="summary-card">
+            <h3>In Progress</h3>
+            <p id="progressComplaints">0</p>
+        </div>
+
+        <div class="summary-card">
+            <h3>Resolved</h3>
+            <p id="resolvedComplaints">0</p>
+        </div>
+
+    </div>
+
+    <div class="table-container">
+
+        <h3>Student Complaints</h3>
+
+        <div class="toolbar">
+            <label for="statusFilter">Filter by status:</label>
+
+            <select id="statusFilter">
+                <option value="All">All Complaints</option>
+                <option value="Pending">Pending</option>
+                <option value="In Progress">In Progress</option>
+                <option value="Resolved">Resolved</option>
+            </select>
+
+            <button type="button" id="refreshBtn">Refresh</button>
+        </div>
+
+        <p id="message" class="message"></p>
+
+        <table>
+            <thead>
+                <tr>
+                    <th>Complaint ID</th>
+                    <th>Student ID</th>
+                    <th>Student Name</th>
+                    <th>Category</th>
+                    <th>Description</th>
+                    <th>Assigned To</th>
+                    <th>Status</th>
+                    <th>Assign Staff</th>
+                    <th>Update Status</th>
+                    <th>Date</th>
+                </tr>
+            </thead>
+
+            <tbody id="complaintTableBody">
+                <tr>
+                    <td colspan="10">Loading complaints...</td>
+                </tr>
+            </tbody>
+        </table>
+
+    </div>
+
+    <br>
+
+    <a href="/dashboards/warden.html" class="action">
+        Back to Warden Dashboard
+    </a>
+
+</div>
+
+<script>
+    let allComplaints = [];
+    let maintenanceStaff = [];
+
+    function escapeHTML(value) {
+        return String(value ?? "").replace(/[&<>"']/g, char => ({
+            "&": "&amp;",
+            "<": "&lt;",
+            ">": "&gt;",
+            '"': "&quot;",
+            "'": "&#39;"
+        })[char]);
+    }
+
+    function updateSummary(complaints) {
+        document.getElementById("totalComplaints").textContent =
+            complaints.length;
+
+        document.getElementById("pendingComplaints").textContent =
+            complaints.filter(c => c.status === "Pending").length;
+
+        document.getElementById("progressComplaints").textContent =
+            complaints.filter(c => c.status === "In Progress").length;
+
+        document.getElementById("resolvedComplaints").textContent =
+            complaints.filter(c => c.status === "Resolved").length;
+    }
+
+    function displayComplaints() {
+        const tbody = document.getElementById("complaintTableBody");
+        const filter = document.getElementById("statusFilter").value;
+
+        const complaints = filter === "All"
+            ? allComplaints
+            : allComplaints.filter(c => c.status === filter);
+
+        if (complaints.length === 0) {
+            tbody.innerHTML = `
+                <tr>
+                    <td colspan="10">No complaints found.</td>
+                </tr>
+            `;
+            return;
+        }
+
+        tbody.innerHTML = complaints.map(c => `
+            <tr>
+                <td>${escapeHTML(c.complaintId)}</td>
+                <td>${escapeHTML(c.studentId)}</td>
+                <td>${escapeHTML(c.studentName)}</td>
+                <td>${escapeHTML(c.category)}</td>
+                <td>${escapeHTML(c.description)}</td>
+                <td>${escapeHTML(c.assignedName)}</td>
+
+                <td class="status ${c.status === "In Progress" ? "In-Progress" : escapeHTML(c.status)}">
+                    ${escapeHTML(c.status)}
+                </td>
+
+                <td class="action-area">
+                    <select class="assign-select"
+                        id="staff-${Number(c.complaintId)}">
+
+                        <option value="">Select Staff</option>
+
+                        ${maintenanceStaff.map(staff => `
+                            <option value="${Number(staff.userId)}"
+                                ${Number(c.assignedTo) === Number(staff.userId) ? "selected" : ""}>
+                                ${escapeHTML(staff.name)}
+                            </option>
+                        `).join("")}
+
+                    </select>
+
+                    <button class="assign-btn"
+                        data-action="assign"
+                        data-id="${Number(c.complaintId)}">
+                        Assign
+                    </button>
+                </td>
+
+                <td>
+                    <select id="status-${Number(c.complaintId)}">
+                        <option value="Pending" ${c.status === "Pending" ? "selected" : ""}>Pending</option>
+                        <option value="In Progress" ${c.status === "In Progress" ? "selected" : ""}>In Progress</option>
+                        <option value="Resolved" ${c.status === "Resolved" ? "selected" : ""}>Resolved</option>
+                    </select>
+
+                    <button class="update-btn"
+                        data-action="status"
+                        data-id="${Number(c.complaintId)}">
+                        Update
+                    </button>
+                </td>
+
+                <td>${escapeHTML(c.createdAt)}</td>
+            </tr>
+        `).join("");
+    }
+
+    async function loadMaintenanceStaff() {
+        const response = await fetch("/api/warden/maintenance-staff", {
+            credentials: "same-origin",
+            cache: "no-store"
+        });
+
+        const data = await response.json();
+
+        if (!response.ok || !data.success) {
+            throw new Error(data.message || "Could not load staff records.");
+        }
+
+        maintenanceStaff = (data.users || []).filter(
+            user => user.role === "Maintenance"
+        );
+    }
+
+    async function loadComplaints() {
+        const tbody = document.getElementById("complaintTableBody");
+
+        tbody.innerHTML = `
+            <tr><td colspan="10">Loading complaints...</td></tr>
+        `;
+
+        try {
+            await loadMaintenanceStaff();
+
+            const response = await fetch("/api/complaints", {
+                credentials: "same-origin",
+                cache: "no-store"
+            });
+
+            const data = await response.json();
+
+            if (!response.ok || !data.success) {
+                throw new Error(data.message || "Could not load complaints.");
+            }
+
+            allComplaints = data.complaints || [];
+
+            updateSummary(allComplaints);
+            displayComplaints();
+
+        } catch (error) {
+            tbody.innerHTML = `
+                <tr><td colspan="10">${escapeHTML(error.message)}</td></tr>
+            `;
+        }
+    }
+
+    async function assignComplaint(complaintId) {
+        const message = document.getElementById("message");
+
+        const staffId = document.getElementById(
+            `staff-${complaintId}`
+        ).value;
+
+        if (!staffId) {
+            message.textContent = "Please select Maintenance Staff.";
+            return;
+        }
+
+        message.textContent = "Assigning complaint...";
+
+        try {
+            const response = await fetch("/api/complaints/assign", {
+                method: "POST",
+                credentials: "same-origin",
+                headers: {
+                    "Content-Type": "application/x-www-form-urlencoded"
+                },
+                body: new URLSearchParams({
+                    complaintId: complaintId,
+                    staffId: staffId
+                })
+            });
+
+            const data = await response.json();
+
+            if (!response.ok || !data.success) {
+                throw new Error(data.message || "Assignment failed.");
+            }
+
+            message.textContent = data.message;
+            await loadComplaints();
+
+        } catch (error) {
+            message.textContent = error.message;
+        }
+    }
+
+    async function updateComplaintStatus(complaintId) {
+        const message = document.getElementById("message");
+
+        const status = document.getElementById(
+            `status-${complaintId}`
+        ).value;
+
+        message.textContent = "Updating complaint...";
+
+        try {
+            const response = await fetch("/api/complaints/status", {
+                method: "POST",
+                credentials: "same-origin",
+                headers: {
+                    "Content-Type": "application/x-www-form-urlencoded"
+                },
+                body: new URLSearchParams({
+                    complaintId: complaintId,
+                    status: status
+                })
+            });
+
+            const data = await response.json();
+
+            if (!response.ok || !data.success) {
+                throw new Error(data.message || "Status update failed.");
+            }
+
+            message.textContent = data.message;
+            await loadComplaints();
+
+        } catch (error) {
+            message.textContent = error.message;
+        }
+    }
+
+    document.getElementById("complaintTableBody")
+        .addEventListener("click", event => {
+
+            const button = event.target.closest("button[data-action]");
+
+            if (!button) return;
+
+            const complaintId = Number(button.dataset.id);
+
+            if (button.dataset.action === "assign") {
+                assignComplaint(complaintId);
+            }
+            else if (button.dataset.action === "status") {
+                updateComplaintStatus(complaintId);
+            }
+        });
+
+    document.getElementById("statusFilter")
+        .addEventListener("change", displayComplaints);
+
+    document.getElementById("refreshBtn")
+        .addEventListener("click", loadComplaints);
+
+    loadComplaints();
+</script>
+
+</body>
+</html>
