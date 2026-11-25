@@ -1,0 +1,120 @@
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Room Allocation - Smart Hostel</title>
+    <link rel="stylesheet" href="../css/style.css">
+</head>
+<body>
+
+<div class="dashboard">
+
+    <aside class="sidebar">
+        <h2>Smart Hostel</h2>
+        <nav>
+            <a href="../index.html">Dashboard</a>
+            <a href="students.html">Students & Staff</a>
+            <a href="rooms.html">Room Management</a>
+            <a href="allocation.html" class="active">Room Allocation</a>
+        </nav>
+    </aside>
+
+    <main class="main-content">
+
+        <header class="topbar">
+            <h1>Room Allocation</h1>
+            <p>Allocate rooms to students and manage existing allocations</p>
+        </header>
+
+        <!-- Allocation Form -->
+        <section class="allocation-form-section">
+            <h2>Allocate a Room</h2>
+
+            <form id="allocationForm">
+
+            <label for="studentSearch">Search Student by Name or ID</label>
+                <input
+                    type="text"
+                    id="studentSearch"
+                    placeholder="Type student name or ID..."
+                    autocomplete="off"
+            >
+
+            <label for="allocationStudent">Select Student</label>
+            <select id="allocationStudent" required>
+                <option value="">Choose a student</option>
+                <option value="101" data-name="Rahul Sharma">101 - Rahul Sharma</option>
+                <option value="102" data-name="Priya Singh">102 - Priya Singh</option>
+            </select>
+                
+
+                <label for="allocationRoom">Select Available Room</label>
+                <select id="allocationRoom" required>
+                    <option value="">Choose a room</option>
+                </select>
+
+                <label for="allocationDate">Allocation Date</label>
+                <input type="date" id="allocationDate" required>
+
+                <button type="submit" class="add-btn">
+                    Allocate Room
+                </button>
+
+            </form>
+        </section>
+
+        <!-- Summary -->
+        <section class="allocation-summary">
+            <div class="allocation-card">
+                <h3>Total Allocations</h3>
+                <p id="totalAllocations">0</p>
+            </div>
+
+            <div class="allocation-card">
+                <h3>Active Allocations</h3>
+                <p id="activeAllocations">0</p>
+            </div>
+
+            <div class="allocation-card">
+                <h3>Vacated Rooms</h3>
+                <p id="vacatedAllocations">0</p>
+            </div>
+        </section>
+
+        <!-- Allocation Records -->
+        <section class="table-container">
+            <h2>Allocation Records</h2>
+
+            <input
+                type="text"
+                id="allocationSearch"
+                placeholder="Search by student name, ID or room number..."
+            >
+
+            <table id="allocationTable">
+                <thead>
+                    <tr>
+                        <th>Allocation ID</th>
+                        <th>Student ID</th>
+                        <th>Student Name</th>
+                        <th>Room Number</th>
+                        <th>Allocation Date</th>
+                        <th>Status</th>
+                        <th>Action</th>
+                    </tr>
+                </thead>
+
+                <tbody id="allocationTableBody">
+                    <!-- Records will be added through JavaScript -->
+                </tbody>
+            </table>
+        </section>
+
+    </main>
+</div>
+
+<script src="../js/script.js"></script>
+</body>
+</html>
