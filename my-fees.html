@@ -1,0 +1,207 @@
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>My Fees - Smart Hostel</title>
+    <link rel="stylesheet" href="../css/style.css">
+
+    <style>
+        .fee-summary {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
+            gap: 18px;
+            margin: 20px 0;
+        }
+
+        .summary-card {
+            background: white;
+            padding: 20px;
+            border-radius: 10px;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.08);
+        }
+
+        .summary-card h3 {
+            margin-bottom: 10px;
+        }
+
+        .fee-table-container {
+            overflow-x: auto;
+            background: white;
+            padding: 18px;
+            border-radius: 10px;
+        }
+
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            min-width: 650px;
+        }
+
+        th, td {
+            padding: 12px;
+            text-align: left;
+            border-bottom: 1px solid #ddd;
+        }
+
+        th {
+            background: #f3f4f6;
+        }
+
+        .status {
+            font-weight: bold;
+        }
+
+        .Paid { color: green; }
+        .Pending { color: orange; }
+        .Overdue { color: red; }
+    </style>
+</head>
+
+<body>
+
+<div class="container">
+
+    <h2>My Fee Details</h2>
+    <p>View your hostel fee records and payment status.</p>
+
+    <div class="fee-summary">
+
+        <div class="summary-card">
+            <h3>Total Fees</h3>
+            <p id="totalAmount">₹0.00</p>
+        </div>
+
+        <div class="summary-card">
+            <h3>Paid</h3>
+            <p id="paidAmount">₹0.00</p>
+        </div>
+
+        <div class="summary-card">
+            <h3>Pending</h3>
+            <p id="pendingAmount">₹0.00</p>
+        </div>
+
+        <div class="summary-card">
+            <h3>Overdue</h3>
+            <p id="overdueAmount">₹0.00</p>
+        </div>
+
+    </div>
+
+    <div class="fee-table-container">
+
+        <h3>My Fee Records</h3>
+
+        <table>
+            <thead>
+                <tr>
+                    <th>Fee ID</th>
+                    <th>Amount</th>
+                    <th>Due Date</th>
+                    <th>Payment Date</th>
+                    <th>Status</th>
+                </tr>
+            </thead>
+
+            <tbody id="feeTableBody">
+                <tr>
+                    <td colspan="5">Loading fee records...</td>
+                </tr>
+            </tbody>
+        </table>
+
+    </div>
+
+    <br>
+
+    <a href="/dashboards/student.html" class="action">Back to Dashboard</a>
+
+</div>
+
+<script>
+    function escapeHTML(value) {
+        return String(value ?? "").replace(/[&<>"']/g, char => ({
+            "&": "&amp;",
+            "<": "&lt;",
+            ">": "&gt;",
+            '"': "&quot;",
+            "'": "&#39;"
+        })[char]);
+    }
+
+    function formatAmount(amount) {
+        return "₹" + Number(amount).toLocaleString("en-IN", {
+            minimumFractionDigits: 2,
+            maximumFractionDigits: 2
+        });
+    }
+
+    async function loadMyFees() {
+        const tbody = document.getElementById("feeTableBody");
+
+        try {
+            const response = await fetch("/api/student/fees", {
+                method: "GET",
+                credentials: "same-origin",
+                cache: "no-store"
+            });
+
+            const data = await response.json();
+
+            if (!response.ok || !data.success) {
+                throw new Error(data.message || "Unable to load fee records.");
+            }
+
+            const fees = data.fees || [];
+
+            let total = 0;
+            let paid = 0;
+            let pending = 0;
+            let overdue = 0;
+
+            if (fees.length === 0) {
+                tbody.innerHTML = `
+                    <tr><td colspan="5">No fee records found.</td></tr>
+                `;
+            } else {
+                tbody.innerHTML = fees.map(fee => {
+                    const amount = Number(fee.amount) || 0;
+                    total += amount;
+
+                    if (fee.status === "Paid") paid += amount;
+                    else if (fee.status === "Pending") pending += amount;
+                    else if (fee.status === "Overdue") overdue += amount;
+
+                    return `
+                        <tr>
+                            <td>${escapeHTML(fee.feeId)}</td>
+                            <td>${formatAmount(amount)}</td>
+                            <td>${escapeHTML(fee.dueDate)}</td>
+                            <td>${escapeHTML(fee.paymentDate || "-")}</td>
+                            <td class="status ${escapeHTML(fee.status)}">
+                                ${escapeHTML(fee.status)}
+                            </td>
+                        </tr>
+                    `;
+                }).join("");
+            }
+
+            document.getElementById("totalAmount").textContent = formatAmount(total);
+            document.getElementById("paidAmount").textContent = formatAmount(paid);
+            document.getElementById("pendingAmount").textContent = formatAmount(pending);
+            document.getElementById("overdueAmount").textContent = formatAmount(overdue);
+
+        } catch (error) {
+            tbody.innerHTML = `
+                <tr><td colspan="5">${escapeHTML(error.message)}</td></tr>
+            `;
+        }
+    }
+
+    loadMyFees();
+</script>
+
+</body>
+</html>
